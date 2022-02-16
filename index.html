@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Archnemesis progress tracking tool</title>
+</head>
+<body>
+  <script>
+    function changeAuto(){
+      var a=localStorage.getItem('auto');
+      if(!a)
+        t=0;
+      else
+        t=a;
+      if (t==1) t=0; else t=1;
+      localStorage.setItem('auto',t);
+      location.reload(true);
+    }
+  </script>
+
+  <div id="AutoButton" style="border:2px solid black; padding:3px; margin:3px; width:150px; cursor:pointer; text-align: center;" onclick="changeAuto();"> Auto mode: </div>
+  <hr />
+  If you like my tool, consider tipping me in game - My IGN is "Rupta" (and I need any of your chaoses, exalts or even mirrors)  :D <br />Thank you :D
+  <hr />
+  <!-- The list of your glyphs in here -->
+  <div id="list" style="display: flex;flex-direction: row; flex-wrap:wrap;">      
+  </div>
+  <div id="possible_recipes">
+    <p style="font-family:Arial; font-weight:bold; padding:20px 0 5px 0; margin:2px;">Possible recipes with what you got are: (Format: Tier number[number of glyphs] Recipe)</p>
+  </div>
+
+</body>
+
+<script>
+var automatic=0; 
+var auto=localStorage.getItem('auto');
+if(!auto)
+  automatic=0;
+  else
+  automatic=auto;
+
+autoBtn = document.getElementById("AutoButton");
+if (automatic==0) autoBtn.innerHTML="Auto mode: OFF"; else autoBtn.innerHTML="Auto mode: ON";
+//var arch='{"name": "archnemesis","recipes": [    {      "name": "Innocence-touched",      "ingredients": [        "Lunaris-touched",        "Solaris-touched",        "Mirror Image",        "Mana Siphoner"      ]    },    {      "name": "Lunaris-touched",      "ingredients": [        "Empowering Minions",        "Invulnerable",        "Frost Strider"      ]    },    {      "name": "Solaris-touched",      "ingredients": [        "Empowering Minions",        "Invulnerable",        "Magma Barrier"      ]    },  ]}';
+//var glyphs = ["Arcane Buffer","Berserker","Bloodletter","Bombardier","Bonebreaker","Chaosweaver","Consecrator","Deadeye","Dynamo","Echoist","Flameweaver","Frenzied","Frostweaver","Gargantuan","Hasted","Incendiary","Juggernaut","Malediction","Opulent","Overcharged","Permafrost","Sentinel","Soul Conduit","Steel-infused","Stormweaver","Toxic","Vampiric","Assassin","Corpse Detonator","Corrupter","Drought Bringer","Entangler","Executioner","Flame Strider","Frost Strider","Heralding Minions","Hexer","Ice Prison","Magma Barrier","Mana Siphoner","Mirror Image","Necromancer","Rejuvenating","Storm Strider","Crystal-skinned","Effigy","Empowered Elements","Empowering Minions","Evocationist","Invulnerable","Soul Eater","Temporal Bubble","Treant Horde","Trickster","Abberath-touched","Arakaali-touched","Brine King-touched","Shakari-touched","Tukohama-touched","Lunaris-touched","Solaris-touched","Innocence-touched","Kitava-touched"];
+
+var glyphs = ["Arcane Buffer","Berserker","Bloodletter","Bombardier","Bonebreaker","Chaosweaver","Consecrator","Deadeye","Dynamo","Echoist","Flameweaver","Frenzied","Frostweaver","Gargantuan","Hasted","Incendiary","Juggernaut","Malediction","Opulent","Overcharged","Permafrost","Sentinel","Soul Conduit","Steel-infused","Stormweaver","Toxic","Vampiric",
+"Assassin","Corrupter","Drought Bringer","Entangler","Empowering Minions","Evocationist","Executioner","Flame Strider","Frost Strider","Heralding Minions","Hexer","Ice Prison","Invulnerable","Magma Barrier","Mana Siphoner","Mirror Image","Necromancer","Rejuvenating","Storm Strider","Treant Horde",
+"Abberath-touched","Corpse Detonator","Crystal-skinned","Effigy","Empowered Elements","Soul Eater","Temporal Bubble","Trickster","Tukohama-touched",
+"Arakaali-touched","Brine King-touched","Kitava-touched","Lunaris-touched","Shakari-touched","Solaris-touched","Innocence-touched"];
+
+var counts;
+counts = JSON.parse(localStorage.getItem('counts'));
+if (!counts) counts = {"Arcane Buffer":0,"Berserker":0,"Bloodletter":0,"Bombardier":0,"Bonebreaker":0,"Chaosweaver":0,"Consecrator":0,"Deadeye":0,"Dynamo":0,"Echoist":0,"Flameweaver":0,"Frenzied":0,"Frostweaver":0,"Gargantuan":0,"Hasted":0,"Incendiary":0,"Juggernaut":0,"Malediction":0,"Opulent":0,"Overcharged":0,"Permafrost":0,"Sentinel":0,"Soul Conduit":0,"Steel-infused":0,"Stormweaver":0,"Toxic":0,"Vampiric":0,"Assassin":0,"Corpse Detonator":0,"Corrupter":0,"Drought Bringer":0,"Entangler":0,"Executioner":0,"Flame Strider":0,"Frost Strider":0,"Heralding Minions":0,"Hexer":0,"Ice Prison":0,"Magma Barrier":0,"Mana Siphoner":0,"Mirror Image":0,"Necromancer":0,"Rejuvenating":0,"Storm Strider":0,"Crystal-skinned":0,"Effigy":0,"Empowered Elements":0,"Empowering Minions":0,"Evocationist":0,"Invulnerable":0,"Soul Eater":0,"Temporal Bubble":0,"Treant Horde":0,"Trickster":0,"Abberath-touched":0,"Arakaali-touched":0,"Brine King-touched":0,"Shakari-touched":0,"Tukohama-touched":0,"Lunaris-touched":0,"Solaris-touched":0,"Innocence-touched":0,"Kitava-touched":0};
+
+
+var tier1 = ["Arcane Buffer (Essence)","Berserker (Uniques)","Bloodletter (Corrupted jewelry/weapons)","Bombardier (armor, weapons)","Bonebreaker (random items, weapons)","Chaosweaver (gems)","Consecrator (fragments)","Deadeye (jewelry, armor)","Dynamo (random items, jewelry)","Echoist (random items, currency)","Flameweaver (weapons)","Frenzied (random items)","Frostweaver (armor)","Gargantuan (currency)","Hasted (random items)","Incendiary (random items, weapons)","Juggernaut (Harbinger)","Malediction (Divination cards)","Opulent (increased rewards)","Overcharged (jewelry)","Permafrost (random items, armor)","Sentinel (armor)","Soul Conduit (maps)","Steel-infused (weapons)","Stormweaver (jewelry)","Toxic (random items, gems)","Vampiric (Fossils)"];
+
+
+
+var tier2 = ["Rejuvenating = Gargantuan + Vampiric (currency, rewards are rolled an additional time)","Corrupter = Bloodletter + Chaosweaver (Abyss, drops corrupted items)","Assassin = Deadeye + Vampiric (currency)","Hexer = Chaosweaver + Echoist (Essencces)","Entangler = Toxic + Bloodletter (Fossils)","Necromancer = Bombardier + Overcharged (random items, rewards are rolled 2 additional times)","Drought Bringer = Malediction + Deadeye (Labyrinth)","Hexer = Chaosweaver + Echoist (Essences)","Evocationist = Flameweaver + Frostweaver + Stormweaver (random items, armor, weapons, jewelry)","Treant Horde = Toxic + Sentinel + Steel-infused (Monster has minions which drop random rewards)","Invulnerable = Sentinel + Juggernaut + Consecrator (Delirium, Metamorph)","Frost Strider = Frostweaver + Hasted (armor)","Storm Strider = Stormweaver + Hasted (jewelry)","Flame Strider = Flameweaver + Hasted","Executioner = Frenzied + Berserker (Legion, Breach)","Magma Barrier = Incendiary + Bonebreaker (weapons)","Ice Prison = Permafrost + Sentinel (armor, rewards are rolled an additional time)","Heralding Minions = Dynamo + Arcane Buffer","Mana Siphoner = Consecrator + Dynamo (jewelry, rewards are rolled an additional time)","Mirror Image = Echoist + Soul Conduit (Scarabs, rewards are rolled an additional time)","Empowering Minions = Necromancer + Executioner + Gargantuan (Blight, Ritual)"];
+var tier3 = ["Effigy = Hexer + Malediction + Corrupter (divination cards, rewards are rolled an additional time)","Crystal-Skinned = Rejuvenating + Permafrost + Berserker (Harbinger)","Temporal Bubble = Juggernaut + Hexer + Arcane Buffer (Heist, Expedition)","Empowered Elements = Evocationist + Steel-infused + Chaosweaver (uniques, rewards are rolled an additional time)","Trickster = Overcharged + Assassin + Echoist","Soul Eater = Necromancer + Soul Conduit + Gargantuan (maps)","Tukohama-touched = Bonebreaker + Executioner + Magma Barrier (weapons, fragments, rewards are rolled 4 additional times)","Corpse Detonator = Necromancer + Incendiary (divination cards)","Abberath-touched = Flame Strider + Frenzied + Rejuvenating (jewelery, maps, rewards are rolled 4 additional times)"];
+var tier4 = ["Lunaris-touched = Frost Strider + Invulnerable + Empowering Minions (uniques, all reward types have an additional reward)","Solaris-touched = Invulnerable + Magma Barrier + Empowering Minions (Scarabs, all reward types have an additional reward)","Arakaali-touched = Corpse Detonator + Entangler + Assassin (all reward types are divination cards)","Innocence-touched = Lunaris-touched + Solaris-touched + Mirror Image + Mana Siphoner (all reward types are currency)","Shakari-touched = Entangler + Soul Eater + Drought Bringer (all reward types are uniques)","Kitava-touched = Abberath-touched + Tukohama-touched + Corrupter + Corpse Detonator (rewards are doubled)","Brine King-touched = Ice Prison + Storm Strider + Heralding Minions (rewards are rolled 6 additional times)"];
+var allTiers =[];
+var IDS=[];
+var retete_disponibile=[];
+
+
+
+function getTier(id){
+  for(let i=0; i<tier1.length; i++)
+  {  
+    let sp = tier1[i].split(" (")[0];
+    if (sp.replace(/\s/g, '').toUpperCase()==id.toUpperCase()) return 1;
+  }
+
+  for(let i=0; i<tier2.length; i++)
+  {  
+    let sp = tier2[i].split(" =")[0];
+    if (sp.replace(/\s/g, '').toUpperCase()==id.toUpperCase()) return 2;
+  }  
+
+  for(let i=0; i<tier3.length; i++)
+  {  
+    let sp = tier3[i].split(" =")[0];
+    if (sp.replace(/\s/g, '').toUpperCase()==id.toUpperCase()) return 3;
+  }  
+  for(let i=0; i<tier4.length; i++)
+  {  
+    let sp = tier4[i].split(" =")[0];
+    if (sp.replace(/\s/g, '').toUpperCase()==id.toUpperCase()) return 4;
+  } 
+  return -1;
+}
+
+function getColor(id){
+  if (id=="Innocence-touched") return "#ffff00";
+  tier = getTier(id)
+  if (tier==1) return "lightgray";
+  if (tier==2) return "lightblue";
+  if (tier==3) return "#ffff99";
+  if (tier==4) return "lightgreen";
+  return "white";
+}
+
+
+
+for(let i=0; i<tier1.length; i++)
+  allTiers.push(tier1[i]);
+for(let i=0; i<tier2.length; i++)
+  allTiers.push(tier2[i]);
+for(let i=0; i<tier3.length; i++)
+  allTiers.push(tier3[i]);
+for(let i=0; i<tier4.length; i++)
+  allTiers.push(tier4[i]);  
+
+
+function add(glyphName){
+  counts[glyphName]++;
+  let save = JSON.stringify(counts);
+  localStorage.setItem('counts', save);
+  location.reload(true);
+}
+function remove(glyphName){
+  if (counts[glyphName]>0)
+  {
+    counts[glyphName]--;
+    let save = JSON.stringify(counts);
+    localStorage.setItem('counts', save);
+    location.reload(true);
+  }
+}
+function addCheck(glyphName){
+  for(let k=0; k<allTiers.length; k++)
+  {                  
+    if (allTiers[k].split(" =")[0].toUpperCase().replace(/\s/g, '')==glyphName.toUpperCase().replace(/\s/g, '')) 
+    {
+      var contor=0;
+      var components = allTiers[k].split(" =")[1].split(" (")[0].split(" + ");                                        
+      for(let j=0; j<components.length; j++)
+      {        
+        components[j]=components[j].replace(/\s/g, '');
+        if (counts[document.getElementById(components[j]).alt]>0) contor++;
+      }            
+
+      if (contor==components.length)
+      {
+        counts[glyphName]++;
+        for(let j=0; j<components.length; j++)
+        {        
+          components[j]=components[j].replace(/\s/g, '');
+          counts[document.getElementById(components[j]).alt]--;
+        } 
+        let save = JSON.stringify(counts);
+        localStorage.setItem('counts', save);
+        location.reload(true);
+      } else
+      window.alert("Insufficient ingredients");     
+    }
+  }
+}
+
+
+for( let i=0; i<glyphs.length; i++)
+  {
+    var nod = document.getElementById("list");  // dupa cine vreau sa adaug     
+    var h = document.createElement("div");
+    h.id=glyphs[i].replace(/\s/g, '');
+    IDS.push(h.id);
+    h.alt = glyphs[i];
+    h.style.border = "1px dotted gray";
+    h.style.width = "300px";
+    h.style.padding = "2px";
+    h.style.margin = "3px";
+    h.style.display = "flex";
+    h.style.flexDirection = "row";
+    h.style.justifyContent = "space-between";
+    h.class="glyph";
+    
+    h.innerHTML = '<div class="glyphName" style="font-weight: bold;text-transform: uppercase; font-family:Arial">'+glyphs[i]+" - "+counts[(glyphs[i])]+"</div>";
+
+    if (automatic==0) h.innerHTML += '<div class="controls" style="width:50px; display:flex"><div style="background-color:white; margin:0 0 0 3px; width:15px; cursor:pointer;font-weight:bold; font-size:15px; border: 1px solid red; text-align: center;" onClick="add(\''+glyphs[i]+'\')">&plus;</div><div style="background-color:white; margin:0 0 0 3px; width:15px; cursor:pointer;font-weight:bold; font-size:15px; border: 1px solid red; text-align: center;" onClick="remove(\''+glyphs[i]+'\')">&minus;</div></div>';
+      else  {
+              h.onclick = function (event) {
+                if (getTier(glyphs[i])==1)add(glyphs[i]);
+                else addCheck(glyphs[i]);
+              };
+              h.onmouseover = function (event) {
+                for(let i=0; i<IDS.length; i++)
+                   document.getElementById(IDS[i]).style.backgroundColor=getColor(IDS[i]);
+                document.getElementById(this.id).style.backgroundColor="#1a1aff";       
+                for(let k=0; k<allTiers.length; k++)
+                {                  
+                  if (allTiers[k].split(" =")[0].toUpperCase().replace(/\s/g, '')==glyphs[i].toUpperCase().replace(/\s/g, '')) 
+                  {
+                    var components = allTiers[k].split(" =")[1].split(" (")[0].split(" + ");                                        
+                    for(let j=0; j<components.length; j++)
+                    {
+                      //console.log(components[j] + components.length);
+                      components[j]=components[j].replace(/\s/g, '');                      
+                      document.getElementById(components[j]).style.backgroundColor=(counts[document.getElementById(components[j]).alt]>0?"green":"red");                        
+                    }                  
+                  }
+                }
+              };
+
+              h.onmouseout = function (event) {
+                for(let i=0; i<IDS.length; i++)
+                  document.getElementById(IDS[i]).style.backgroundColor=getColor(IDS[i]);                  
+              };                            
+      }
+    nod.appendChild(h); // adaug dupa nodul "nod"    
+  }  
+  for(let i=0; i<IDS.length; i++)
+                  document.getElementById(IDS[i]).style.backgroundColor=getColor(IDS[i]);    
+
+  
+  for(let i=0; i<tier4.length; i++)
+  {
+      let components = tier4[i].split(" =")[1].split(" (")[0].split(" + ");
+      let contor=0;
+      for(let j=0; j<components.length; j++)
+        if (counts[document.getElementById(components[j].replace(/\s/g, '')).alt]>0) contor++;
+      if (contor==components.length) retete_disponibile.push("T4:["+contor+"] "+tier4[i]);      
+  }
+  for(let i=0; i<tier3.length; i++)
+  {
+      let components = tier3[i].split(" =")[1].split(" (")[0].split(" + ");
+      let contor=0;
+      for(let j=0; j<components.length; j++)
+        if (counts[document.getElementById(components[j].replace(/\s/g, '')).alt]>0) contor++;
+      if (contor==components.length) retete_disponibile.push("T3:["+contor+"] "+tier3[i]);      
+  }
+  for(let i=0; i<tier2.length; i++)
+  {
+      let components = tier2[i].split(" =")[1].split(" (")[0].split(" + ");
+      let contor=0;
+      for(let j=0; j<components.length; j++)
+        if (counts[document.getElementById(components[j].replace(/\s/g, '')).alt]>0) contor++;
+      if (contor==components.length) {
+        retete_disponibile.push("T2:["+contor+"] "+tier2[i]);      
+      }
+  }      
+  for(let i=0; i<retete_disponibile.length; i++)
+  {
+    document.getElementById("possible_recipes").innerHTML+='<p style="font-family:Arial; padding:2px; margin:2px;">'+retete_disponibile[i]+'</p>';    
+  }
+  
+
+
+  
+</script>
+
+</html>
